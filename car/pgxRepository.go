@@ -20,7 +20,7 @@ func NewPgxRepository(db *pgxpool.Pool) *PgxRepository {
 	}
 }
 
-// method of Migrate
+// /////////////////////////////////////// start migration (create table of cars if it doesn't exist)
 func (r *PgxRepository) Migrate(ctx context.Context) error {
 	query := `
     CREATE TABLE IF NOT EXISTS cars(
@@ -35,7 +35,8 @@ func (r *PgxRepository) Migrate(ctx context.Context) error {
 	return err
 }
 
-// method of create a car
+////////////////////////////////////////////// create a car data
+
 func (r *PgxRepository) CreateCar(ctx context.Context, c Car) (*Car, error) {
 	var id int64
 	err := r.db.QueryRow(ctx, "INSERT INTO cars(brand, model, color, price) values($1, $2, $3, $4) RETURNING id", c.Brand, c.Model, c.Color, c.Price).Scan(&id)
@@ -53,7 +54,7 @@ func (r *PgxRepository) CreateCar(ctx context.Context, c Car) (*Car, error) {
 	return &c, nil
 }
 
-// retrieve all cars data from the database
+// //////////////////////////////////////////// get all cars data
 func (r *PgxRepository) AllCars(ctx context.Context) ([]Car, error) {
 	rows, err := r.db.Query(ctx, "SELECT * FROM cars")
 	if err != nil {
@@ -72,7 +73,7 @@ func (r *PgxRepository) AllCars(ctx context.Context) ([]Car, error) {
 	return allCars, nil
 }
 
-// retrive data of a single car using its unique id
+// //////////////////////////////////////////// get a single car data by ID
 func (r *PgxRepository) GetCarById(ctx context.Context, id int64) (*Car, error) {
 	row := r.db.QueryRow(ctx, "SELECT * FROM cars WHERE id = $1", id)
 
@@ -86,7 +87,7 @@ func (r *PgxRepository) GetCarById(ctx context.Context, id int64) (*Car, error) 
 	return &car, nil
 }
 
-// update the data of a single car
+// //////////////////////////////////////////// update a single car data
 func (r *PgxRepository) UpdateCar(ctx context.Context, id int64, updated Car) (*Car, error) {
 	res, err := r.db.Exec(ctx, "UPDATE cars SET brand=$1, model=$2, color=$3, price=$4 WHERE id = $5", updated.Brand, updated.Model, updated.Color, updated.Price, id)
 	if err != nil {
@@ -106,7 +107,7 @@ func (r *PgxRepository) UpdateCar(ctx context.Context, id int64, updated Car) (*
 	return &updated, nil
 }
 
-// delete data of a single car using a unique id
+// //////////////////////////////////////////// Delete a single car data
 func (r *PgxRepository) DeleteCar(ctx context.Context, id int64) error {
 	res, err := r.db.Exec(ctx, "DELETE FROM cars WHERE id = $1", id)
 	if err != nil {

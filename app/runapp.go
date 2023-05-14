@@ -10,6 +10,7 @@ import (
 )
 
 func RunRepository(ctx context.Context, carRepo car.Repository) {
+	///////////////////////////////////////// start migration (create table of cars if it doesn't exist)
 	fmt.Println("1. MIGRATE REPOSITORY")
 	if err := carRepo.Migrate(ctx); err != nil {
 		log.Fatal(err)
